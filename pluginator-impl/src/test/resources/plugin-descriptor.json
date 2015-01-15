@@ -1,0 +1,36 @@
+{
+  "name" : "nameValue",
+  "description" : "descriptionValue",
+  "groupId" : "groupIdValue",
+  "artifactId" : "artifactIdValue",
+  "version" : "versionValue",
+  "activator" : "activatorValue",
+  "dependencies" : [
+    {
+      "groupId" : "groupIdValueDependency1",
+      "artifactId" : "artifactIdValueDependency1",
+      "version" : "versionValueDependency1",
+      "scope" : "required"
+    },
+    {
+      "groupId" : "groupIdValueDependency2",
+      "artifactId" : "artifactIdValueDependency2",
+      "version" : "versionValueDependency2",
+      "scope" : "optional"
+    }
+  ],
+  "pluginDependencies" : [
+    {
+      "groupId" : "groupIdValuePluginDependency1",
+      "artifactId" : "artifactIdValuePluginDependency1",
+      "version" : "versionValuePluginDependency1",
+      "scope" : "required"
+    },
+    {
+      "groupId" : "groupIdValuePluginDependency2",
+      "artifactId" : "artifactIdValuePluginDependency2",
+      "version" : "versionValuePluginDependency2",
+      "scope" : "optional"
+    }
+  ]
+}

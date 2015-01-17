@@ -10,7 +10,7 @@
 
     <groupId>cz.cuni.mff.d3s.been.pluginator</groupId>
     <artifactId>pluginator-maven-plugin</artifactId>
-    <packaging>jar</packaging>
+    <packaging>maven-plugin</packaging>
 
     <name>pluginator-maven-plugin</name>
     <url>http://palusga.cz/pluginator</url>
@@ -35,4 +35,5 @@
             <scope>provided</scope>
         </dependency>
     </dependencies>
+
 </project>

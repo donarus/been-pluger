@@ -1,3 +1,3 @@
-BEEN-PLUGINATOR
+BEEN-PLUGER
 
-[Pluginator temporary homepage](http://donarus.github.io/been-pluginator)
+[Pluger temporary homepage](http://donarus.github.io/been-pluger)

@@ -4,12 +4,12 @@
                       http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>cz.cuni.mff.d3s.been.pluginator</groupId>
-    <artifactId>pluginator</artifactId>
+    <groupId>cz.cuni.mff.d3s.been.pluger</groupId>
+    <artifactId>pluger</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>Pluginator Parent</name>
+    <name>Pluger Parent</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -82,13 +82,13 @@
         <dependencies>
             <!-- PROJECT DEPENDENCIES -->
             <dependency>
-                <groupId>cz.cuni.mff.d3s.been.pluginator</groupId>
-                <artifactId>pluginator</artifactId>
+                <groupId>cz.cuni.mff.d3s.been.pluger</groupId>
+                <artifactId>pluger</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>cz.cuni.mff.d3s.been.pluginator</groupId>
-                <artifactId>pluginator-api</artifactId>
+                <groupId>cz.cuni.mff.d3s.been.pluger</groupId>
+                <artifactId>pluger-api</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -142,18 +142,18 @@
 
     <profiles>
         <profile>
-            <id>pluginator</id>
+            <id>pluger</id>
 
             <modules>
-                <module>pluginator-api</module>
-                <module>pluginator-impl</module>
+                <module>pluger-api</module>
+                <module>pluger-impl</module>
             </modules>
         </profile>
         <profile>
-            <id>pluginator-maven-plugin</id>
+            <id>pluger-maven-plugin</id>
 
             <modules>
-                <module>pluginator-maven-plugin</module>
+                <module>pluger-maven-plugin</module>
             </modules>
         </profile>
     </profiles>

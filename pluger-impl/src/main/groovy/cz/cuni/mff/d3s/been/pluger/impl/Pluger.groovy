@@ -17,9 +17,9 @@ import java.nio.file.Path
 
 class Pluger {
 
-    static final String WORKING_DIRECTORY_KEY = "working.directory"
+    public static final String WORKING_DIRECTORY_KEY = "working.directory"
 
-    static final String DEPENDENCIES_FINAL_KEY = "dependencies.final"
+    public static final String DEPENDENCIES_FINAL_KEY = "dependencies.final"
 
     private PlugerConfig config
 

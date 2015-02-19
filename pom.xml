@@ -54,13 +54,21 @@
                     <groupId>org.codehaus.gmavenplus</groupId>
                     <artifactId>gmavenplus-plugin</artifactId>
                     <version>${gmavenplus-plugin.version}</version>
+                    <configuration>
+                        <stubsOutputDirectory>${project.build.directory}/generated-groovy-stubs/main</stubsOutputDirectory>
+                        <testStubsOutputDirectory>${project.build.directory}/generated-groovy-test-stubs/main</testStubsOutputDirectory>
+                    </configuration>
                     <executions>
                         <execution>
                             <goals>
+                                <goal>addSources</goal>
+                                <goal>addTestSources</goal>
                                 <goal>generateStubs</goal>
                                 <goal>compile</goal>
                                 <goal>testGenerateStubs</goal>
                                 <goal>testCompile</goal>
+                                <goal>removeStubs</goal>
+                                <goal>removeTestStubs</goal>
                             </goals>
                         </execution>
                     </executions>
@@ -89,6 +97,11 @@
             <dependency>
                 <groupId>cz.cuni.mff.d3s.been.pluger</groupId>
                 <artifactId>pluger-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>cz.cuni.mff.d3s.been.pluger</groupId>
+                <artifactId>pluger-impl</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

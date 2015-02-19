@@ -22,7 +22,7 @@
     <dependencies>
         <dependency>
             <groupId>cz.cuni.mff.d3s.been.pluger</groupId>
-            <artifactId>pluger-api</artifactId>
+            <artifactId>pluger-impl</artifactId>
         </dependency>
 
 
@@ -42,6 +42,7 @@
             <artifactId>maven-core</artifactId>
             <version>3.2.5</version>
         </dependency>
+
 
 
 

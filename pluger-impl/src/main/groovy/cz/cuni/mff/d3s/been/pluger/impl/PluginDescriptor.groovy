@@ -1,5 +1,8 @@
 package cz.cuni.mff.d3s.been.pluger.impl
 
+import groovy.json.JsonBuilder
+import groovy.json.JsonSlurper
+
 import java.nio.file.Path
 
 class PluginDescriptor {
@@ -38,6 +41,24 @@ class PluginDescriptor {
                     DependencyDescriptor.create(it)
                 }
         )
+        // TODO add validation ... should be similar to validation implemented in DepencencyDescriptor
+    }
+
+    Map toMap() {
+        [
+                name              : name,
+                description       : description,
+                groupId           : groupId,
+                artifactId        : artifactId,
+                version           : version,
+                activator         : activator,
+                dependencies      : dependencies.collect { it.toMap() },
+                pluginDependencies: pluginDependencies.collect { it.toMap() }
+        ]
+    }
+
+    String createJsonDescriptor() {
+        new JsonBuilder(toMap()).toPrettyString()
     }
 
     boolean equals(o) {

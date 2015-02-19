@@ -10,13 +10,13 @@
       "groupId" : "groupIdValueDependency1",
       "artifactId" : "artifactIdValueDependency1",
       "version" : "versionValueDependency1",
-      "scope" : "required"
+      "scope" : "REQUIRED"
     },
     {
       "groupId" : "groupIdValueDependency2",
       "artifactId" : "artifactIdValueDependency2",
       "version" : "versionValueDependency2",
-      "scope" : "optional"
+      "scope" : "OPTIONAL"
     }
   ],
   "pluginDependencies" : [
@@ -24,13 +24,13 @@
       "groupId" : "groupIdValuePluginDependency1",
       "artifactId" : "artifactIdValuePluginDependency1",
       "version" : "versionValuePluginDependency1",
-      "scope" : "required"
+      "scope" : "REQUIRED"
     },
     {
       "groupId" : "groupIdValuePluginDependency2",
       "artifactId" : "artifactIdValuePluginDependency2",
       "version" : "versionValuePluginDependency2",
-      "scope" : "optional"
+      "scope" : "OPTIONAL"
     }
   ]
 }

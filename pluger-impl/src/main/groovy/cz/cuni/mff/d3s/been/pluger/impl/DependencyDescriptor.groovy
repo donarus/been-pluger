@@ -12,10 +12,6 @@ class DependencyDescriptor {
 
     DependencyScope scope
 
-    private DependencyDescriptor() {
-        // should be instantiated only by create method
-    }
-
     static DependencyDescriptor create(Map dependencyDescriptorMap) {
         def scopeStr = (dependencyDescriptorMap.remove('scope') as String)
         def scope = null
@@ -39,6 +35,16 @@ class DependencyDescriptor {
 
         descriptor
     }
+
+    Map toMap() {
+        [
+                groupId   : groupId,
+                artifactId: artifactId,
+                version   : version,
+                scope     : scope
+        ]
+    }
+
 
     private static validate(DependencyDescriptor descriptor) {
         def msgs = []

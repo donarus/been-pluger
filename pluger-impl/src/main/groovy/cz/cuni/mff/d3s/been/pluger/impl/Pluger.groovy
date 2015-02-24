@@ -7,6 +7,8 @@ import cz.cuni.mff.d3s.been.pluger.IPluginActivatorLoader
 import cz.cuni.mff.d3s.been.pluger.IPluginInitializer
 import cz.cuni.mff.d3s.been.pluger.IPluginInjector
 import cz.cuni.mff.d3s.been.pluger.IPluginLoader
+import cz.cuni.mff.d3s.been.pluger.IServicePreregistrator
+import cz.cuni.mff.d3s.been.pluger.IServiceRegistrator
 import cz.cuni.mff.d3s.been.pluger.IServiceRegistry
 import cz.cuni.mff.d3s.been.pluger.IPluginStarter
 import cz.cuni.mff.d3s.been.pluger.IPluginUnpacker
@@ -21,7 +23,7 @@ class Pluger {
 
     public static final String DEPENDENCIES_FINAL_KEY = "dependencies.final"
 
-    private PlugerConfig config
+    private PlugerConfig plugerConfig
 
     private IServiceRegistry pluginRegistry
 
@@ -45,15 +47,18 @@ class Pluger {
 
     private IPluginStarter pluginStarter
 
+    private List<IServicePreregistrator> servicePreregistrators = []
+
     private Pluger() {
-        // prevents outer instantiation .. use create(..) method
+        // use Pluger.create(config) instead !!!
     }
 
     public void start() {
-        def allPlugins = pluginLoader.loadPlugins(config)
-        def allowedPlugins = pluginFilter.filter(config, allPlugins)
-        pluginUnpacker.unpack(config, allowedPlugins)
-        def resolvedDependencies = dependencyResolver.resolve(config, allowedPlugins)
+        preRegisterServices(pluginRegistry)
+        def allPlugins = pluginLoader.loadPlugins(plugerConfig)
+        def allowedPlugins = pluginFilter.filter(plugerConfig, allPlugins)
+        pluginUnpacker.unpack(plugerConfig, allowedPlugins)
+        def resolvedDependencies = dependencyResolver.resolve(plugerConfig, allowedPlugins)
         def pluginClassloader = jarLoader.loadJars(resolvedDependencies)
         def pluginActivators = pluginActivatorLoader.loadActivators(allowedPlugins, pluginClassloader)
         serviceRegistrator.activateServices(pluginRegistry, pluginActivators)
@@ -62,9 +67,19 @@ class Pluger {
         pluginStarter.start(pluginActivators)
     }
 
-    public static Pluger create(Map<String, Object> config) {
-        Path workingDirectory = config.get(WORKING_DIRECTORY_KEY)
-        Collection<String> finalDependencies = config.get(DEPENDENCIES_FINAL_KEY)
+    void preRegisterServices(IServiceRegistry registry) {
+        servicePreregistrators.each {
+            it.registerService(registry)
+        }
+    }
+
+    public void addServicePreregistrator(IServicePreregistrator preregistrator) {
+        servicePreregistrators << preregistrator
+    }
+
+    public static Pluger create(Map<String, Object> configuration) {
+        Path workingDirectory = configuration.get(WORKING_DIRECTORY_KEY)
+        Collection<String> finalDependencies = configuration.get(DEPENDENCIES_FINAL_KEY)
 
         def unpackedLibsDirectory = Files.createDirectories(workingDirectory.resolve('libs'))
         def pluginsDirectory = Files.createDirectories(workingDirectory.resolve('plugins'))
@@ -74,8 +89,9 @@ class Pluger {
         def disabledPluginsConfigFile = configDirectory.resolve('disabled-plugins.conf')
         def disabledPlugins = Files.isReadable(disabledPluginsConfigFile) ? Files.readAllLines(disabledPluginsConfigFile) : []
 
-        return new Pluger(
-                config: new PlugerConfig(
+
+        new Pluger(
+                plugerConfig: new PlugerConfig(
                         workingDirectory: workingDirectory.toAbsolutePath(),
                         unpackedLibsDirectory: unpackedLibsDirectory,
                         pluginsDirectory: pluginsDirectory.toAbsolutePath(),

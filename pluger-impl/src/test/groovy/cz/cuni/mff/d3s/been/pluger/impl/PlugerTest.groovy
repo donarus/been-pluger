@@ -7,6 +7,8 @@ import cz.cuni.mff.d3s.been.pluger.IPluginActivatorLoader
 import cz.cuni.mff.d3s.been.pluger.IPluginInitializer
 import cz.cuni.mff.d3s.been.pluger.IPluginInjector
 import cz.cuni.mff.d3s.been.pluger.IPluginLoader
+import cz.cuni.mff.d3s.been.pluger.IServicePreregistrator
+import cz.cuni.mff.d3s.been.pluger.IServiceRegistrator
 import cz.cuni.mff.d3s.been.pluger.IServiceRegistry
 import cz.cuni.mff.d3s.been.pluger.IPluginStarter
 import cz.cuni.mff.d3s.been.pluger.IPluginUnpacker
@@ -37,17 +39,18 @@ class PlugerTest extends Specification {
 
         then:
             assert pluger instanceof Pluger
-            assert pluger.config.workingDirectory == workingDir
-            assert pluger.config.configDirectory == workingDir.resolve('config')
-            assert Files.isDirectory(pluger.@config.configDirectory)
-            assert pluger.config.pluginsDirectory == workingDir.resolve('plugins')
-            assert Files.isDirectory(pluger.@config.pluginsDirectory)
-            assert pluger.config.temporaryDirectory == workingDir.resolve('tmp')
-            assert Files.isDirectory(pluger.@config.temporaryDirectory)
-            assert pluger.config.disabledPluginsConfigFile == workingDir.resolve('config').resolve('disabled-plugins.conf')
-            assert !Files.exists(pluger.@config.disabledPluginsConfigFile)
-            assert pluger.config.disabledPlugins == []
+            assert pluger.plugerConfig.workingDirectory == workingDir
+            assert pluger.plugerConfig.configDirectory == workingDir.resolve('config')
+            assert Files.isDirectory(pluger.@plugerConfig.configDirectory)
+            assert pluger.plugerConfig.pluginsDirectory == workingDir.resolve('plugins')
+            assert Files.isDirectory(pluger.@plugerConfig.pluginsDirectory)
+            assert pluger.plugerConfig.temporaryDirectory == workingDir.resolve('tmp')
+            assert Files.isDirectory(pluger.@plugerConfig.temporaryDirectory)
+            assert pluger.plugerConfig.disabledPluginsConfigFile == workingDir.resolve('config').resolve('disabled-plugins.conf')
+            assert !Files.exists(pluger.@plugerConfig.disabledPluginsConfigFile)
+            assert pluger.plugerConfig.disabledPlugins == []
 
+            assert pluger.servicePreregistrators == []
             assert pluger.pluginRegistry instanceof PlugerRegistry
             assert pluger.pluginLoader instanceof PluginLoader
             assert pluger.pluginFilter instanceof PluginFilter
@@ -78,11 +81,11 @@ class PlugerTest extends Specification {
             def pluginStarter = Mock(IPluginStarter)
 
             def pluger = new Pluger(
-                    config: config,
+                    plugerConfig: config,
                     pluginRegistry: pluginRegistry,
                     pluginLoader: pluginLoader,
                     pluginFilter: pluginFilter,
-                    pluginUnpacker : pluginUnpacker,
+                    pluginUnpacker: pluginUnpacker,
                     dependencyResolver: dependencyResolver,
                     jarLoader: jarLoader,
                     pluginActivatorLoader: pluginActivatorLoader,
@@ -114,8 +117,19 @@ class PlugerTest extends Specification {
                     Mock(IPluginActivator)
             ]
 
+            def preregisteredService = Mock(Object)
+            pluger.addServicePreregistrator(new IServicePreregistrator() {
+                @Override
+                void registerService(IServiceRegistrator registry) {
+                    registry.registerService(preregisteredService)
+                }
+            })
+
         when:
             pluger.start()
+
+        then:
+            1 * pluginRegistry.registerService(preregisteredService)
 
         then:
             1 * pluginLoader.loadPlugins(config) >> allPlugins

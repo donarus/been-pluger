@@ -2,9 +2,11 @@ package cz.cuni.mff.d3s.been.pluger.impl
 
 import cz.cuni.mff.d3s.been.pluger.IPluginUnpacker
 
+import java.nio.file.CopyOption
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.nio.file.StandardCopyOption
 import java.util.zip.ZipFile
 
 class PluginUnpacker implements IPluginUnpacker {
@@ -45,8 +47,8 @@ class PluginUnpacker implements IPluginUnpacker {
         def onDiskJarPath = onDiskJarParentPath.resolve(Paths.get(jarName))
         Files.createDirectories(onDiskJarParentPath)
         if (Files.notExists(onDiskJarPath) || version.endsWith("-SNAPSHOT")) {
-            // TODO missing unit test that snapshot dependencies are always unpacked
-            Files.copy(zipFile.getInputStream(jarDependencyEntry), onDiskJarPath)
+            // TODO  missing unit test that snapshot dependencies are always unpacked
+            Files.copy(zipFile.getInputStream(jarDependencyEntry), onDiskJarPath, StandardCopyOption.REPLACE_EXISTING)
         }
     }
 

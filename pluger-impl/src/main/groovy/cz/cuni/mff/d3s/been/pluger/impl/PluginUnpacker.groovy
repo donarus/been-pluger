@@ -44,7 +44,8 @@ class PluginUnpacker implements IPluginUnpacker {
 
         def onDiskJarPath = onDiskJarParentPath.resolve(Paths.get(jarName))
         Files.createDirectories(onDiskJarParentPath)
-        if (Files.notExists(onDiskJarPath)) {
+        if (Files.notExists(onDiskJarPath) || version.endsWith("-SNAPSHOT")) {
+            // TODO missing unit test that snapshot dependencies are always unpacked
             Files.copy(zipFile.getInputStream(jarDependencyEntry), onDiskJarPath)
         }
     }

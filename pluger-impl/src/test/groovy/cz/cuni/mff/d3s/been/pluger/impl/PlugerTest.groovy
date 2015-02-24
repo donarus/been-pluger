@@ -41,13 +41,15 @@ class PlugerTest extends Specification {
             assert pluger instanceof Pluger
             assert pluger.plugerConfig.workingDirectory == workingDir
             assert pluger.plugerConfig.configDirectory == workingDir.resolve('config')
-            assert Files.isDirectory(pluger.@plugerConfig.configDirectory)
+            assert Files.isDirectory(pluger.plugerConfig.configDirectory)
             assert pluger.plugerConfig.pluginsDirectory == workingDir.resolve('plugins')
-            assert Files.isDirectory(pluger.@plugerConfig.pluginsDirectory)
+            assert Files.isDirectory(pluger.plugerConfig.pluginsDirectory)
             assert pluger.plugerConfig.temporaryDirectory == workingDir.resolve('tmp')
-            assert Files.isDirectory(pluger.@plugerConfig.temporaryDirectory)
+            assert Files.isDirectory(pluger.plugerConfig.temporaryDirectory)
+            assert pluger.plugerConfig.unpackedLibsDirectory == workingDir.resolve('libs')
+            assert Files.isDirectory(pluger.plugerConfig.unpackedLibsDirectory)
             assert pluger.plugerConfig.disabledPluginsConfigFile == workingDir.resolve('config').resolve('disabled-plugins.conf')
-            assert !Files.exists(pluger.@plugerConfig.disabledPluginsConfigFile)
+            assert !Files.exists(pluger.plugerConfig.disabledPluginsConfigFile)
             assert pluger.plugerConfig.disabledPlugins == []
 
             assert pluger.servicePreregistrators == []
@@ -62,6 +64,32 @@ class PlugerTest extends Specification {
             assert pluger.pluginInjector instanceof PluginInjector
             assert pluger.pluginInitializer instanceof PluginInitializer
             assert pluger.pluginStarter instanceof PluginStarter
+    }
+
+    def 'libs dir is deleted when this is specified in configuration'() {
+        given:
+            def workingDir = tmpFolder.newFolder().toPath()
+            def config = [
+                    (Pluger.WORKING_DIRECTORY_KEY) : workingDir,
+                    (Pluger.DEPENDENCIES_FINAL_KEY): [],
+                    (Pluger.CLEAR_LIB_DIR_KEY)     : shouldBeDeleted
+            ]
+            def libsDir = workingDir.resolve("libs")
+            Files.createDirectories(libsDir)
+            def testFile = libsDir.resolve("test.jar")
+
+            testFile.write("LOREM IPSUM DOLOR SIT AMET")
+
+        when:
+            Pluger.create(config)
+
+        then:
+            assert testFile.toFile().exists() == exists
+
+        where:
+            shouldBeDeleted | exists
+            true            | false
+            false           | true
     }
 
 

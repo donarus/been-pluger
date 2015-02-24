@@ -23,6 +23,8 @@ class Pluger {
 
     public static final String DEPENDENCIES_FINAL_KEY = "dependencies.final"
 
+    public static final String CLEAR_LIB_DIR_KEY = "clear.libs"
+
     private PlugerConfig plugerConfig
 
     private IServiceRegistry pluginRegistry
@@ -80,8 +82,14 @@ class Pluger {
     public static Pluger create(Map<String, Object> configuration) {
         Path workingDirectory = configuration.get(WORKING_DIRECTORY_KEY)
         Collection<String> finalDependencies = configuration.get(DEPENDENCIES_FINAL_KEY)
+        boolean clearLibDir = configuration.get(CLEAR_LIB_DIR_KEY) == true
 
-        def unpackedLibsDirectory = Files.createDirectories(workingDirectory.resolve('libs'))
+
+        def libsDir = workingDirectory.resolve('libs')
+        if (clearLibDir) {
+            libsDir.deleteDir()
+        }
+        def unpackedLibsDirectory = Files.createDirectories(libsDir)
         def pluginsDirectory = Files.createDirectories(workingDirectory.resolve('plugins'))
         def configDirectory = Files.createDirectories(workingDirectory.resolve('config'))
         def temporaryDirectory = Files.createDirectories(workingDirectory.resolve('tmp'))

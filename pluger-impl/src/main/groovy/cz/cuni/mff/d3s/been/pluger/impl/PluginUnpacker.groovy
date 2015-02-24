@@ -14,26 +14,6 @@ class PluginUnpacker implements IPluginUnpacker {
         unpackDependenciesAndPlugins(config.unpackedLibsDirectory, pluginDescriptors)
     }
 
-    private Collection<Path> findRequiredDependenciesPaths(Path unpackedLibsDirectory, Collection<DependencyDescriptor> dependencyDescriptors) {
-        dependencyDescriptors = dependencyDescriptors.groupBy {
-            "${it.groupId}:${it.artifactId}"
-        }.values().each {
-            def first = it.sort { it.version }.last()
-            it.clear()
-            it.add(first)
-        }.flatten()
-
-
-        dependencyDescriptors.collect { dependency ->
-            def relativeJarPath = dependency.groupId.split("\\.") + dependency.artifactId + dependency.version + "${dependency.artifactId}-${dependency.version}.jar"
-            def jarPath = unpackedLibsDirectory
-            relativeJarPath.each {
-                jarPath = jarPath.resolve(it)
-            }
-            jarPath
-        }
-    }
-
     private Collection<Path> unpackDependenciesAndPlugins(Path pluginsDir, Collection<PluginDescriptor> pluginDescriptors) {
         pluginDescriptors.collect {
             unpackDependenciesAndPlugin(pluginsDir, it)

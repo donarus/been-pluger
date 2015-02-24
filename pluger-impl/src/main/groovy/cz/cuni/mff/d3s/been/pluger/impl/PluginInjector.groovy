@@ -15,7 +15,7 @@ class PluginInjector implements IPluginInjector {
 
     private void injectService(Service subjectService, IServiceRegistry pluginRegistry) {
         def subject = subjectService.serviceInstance
-        def currentClass = subject.class
+        def currentClass = subject.getClass()
         while(currentClass.superclass) { // we don't want to process Object.class
             currentClass.declaredFields.each { def field ->
                 def injectAnnotation = field.getAnnotation(InjectService.class)
@@ -29,6 +29,7 @@ class PluginInjector implements IPluginInjector {
                     } else if (field.type.array) {
                         injectedValue = pluginRegistry.getServices(serviceInterface)
                     } else if (serviceName) {
+                        // fixme .. UNIT TESTS !!! this is failing if missing service interface
                         injectedValue = pluginRegistry.getService(serviceName, serviceInterface)
                     } else {
                         injectedValue = pluginRegistry.getService(serviceInterface)

@@ -50,7 +50,7 @@ class PlugerRegistry implements IServiceRegistry {
 
     @Override
     def <C> C registerService(C serviceImplementationInstance) {
-        registerService(serviceImplementationInstance.class.name, serviceImplementationInstance.class, serviceImplementationInstance)
+        registerService(serviceImplementationInstance.getClass().name, serviceImplementationInstance.getClass(), serviceImplementationInstance)
     }
 
     @Override
@@ -60,7 +60,7 @@ class PlugerRegistry implements IServiceRegistry {
 
     @Override
     def <C> C registerService(String serviceName, C serviceImplementationInstance) {
-        registerService(serviceName, serviceImplementationInstance.class, serviceImplementationInstance)
+        registerService(serviceName, serviceImplementationInstance.getClass(), serviceImplementationInstance)
     }
 
     @Override

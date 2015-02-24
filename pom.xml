@@ -55,8 +55,25 @@
                     <artifactId>gmavenplus-plugin</artifactId>
                     <version>${gmavenplus-plugin.version}</version>
                     <configuration>
-                        <stubsOutputDirectory>${project.build.directory}/generated-groovy-stubs/main</stubsOutputDirectory>
-                        <testStubsOutputDirectory>${project.build.directory}/generated-groovy-test-stubs/main</testStubsOutputDirectory>
+                        <sourceEncoding>${project.build.sourceEncoding}</sourceEncoding>
+                        <stubsOutputDirectory>${project.build.directory}/generated-groovy-stubs</stubsOutputDirectory>
+                        <testStubsOutputDirectory>${project.build.directory}/generated-groovy-test-stubs</testStubsOutputDirectory>
+                        <testSources>
+                            <fileSet>
+                                <directory>${project.basedir}/src/test/groovy</directory>
+                                <includes>
+                                    <include>**/*.groovy</include>
+                                </includes>
+                            </fileSet>
+                        </testSources>
+                        <sources>
+                            <fileSet>
+                                <directory>${project.basedir}/src/main/groovy</directory>
+                                <includes>
+                                    <include>**/*.groovy</include>
+                                </includes>
+                            </fileSet>
+                        </sources>
                     </configuration>
                     <executions>
                         <execution>

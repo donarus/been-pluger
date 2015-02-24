@@ -41,6 +41,8 @@ public class PlugerMojo extends AbstractMojo {
     @Parameter(required = true)
     private String activator;
 
+    @Parameter(defaultValue = "${project.build.directory}")
+    private String projectBuildDir;
 
     public void execute() throws MojoExecutionException, MojoFailureException {
 
@@ -60,7 +62,9 @@ public class PlugerMojo extends AbstractMojo {
 
         String jsonDescriptor = descriptor.createJsonDescriptor();
 
-        try (ZipOutputStream zip = new ZipOutputStream(new FileOutputStream("/tmp/plugin.zip"))) {
+        String pluginFileName = String.format("%s-%s.plugin", project.getArtifactId(), project.getVersion());
+        File pluginDestFile = new File(projectBuildDir, pluginFileName);
+        try (ZipOutputStream zip = new ZipOutputStream(new FileOutputStream(pluginDestFile))) {
 
 
             ZipEntry pluginJarEntry = new ZipEntry(String.format("%s-%s.jar", project.getArtifactId(), project.getVersion()));
@@ -155,7 +159,7 @@ public class PlugerMojo extends AbstractMojo {
         }
     }
 
-    private Map<Artifact, DependencyDescriptor> collectDependencies(Artifact artifact, boolean optional) throws MojoFailureException {
+    private Map<Artifact, DependencyDescriptor> collectDependencies(final Artifact artifact, final boolean optional) throws MojoFailureException {
         try {
             Dependency dependency = new Dependency(artifact, JavaScopes.RUNTIME);
             CollectRequest collectRequest = new CollectRequest(dependency, null);

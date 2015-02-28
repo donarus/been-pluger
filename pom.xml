@@ -56,23 +56,21 @@
                     <version>${gmavenplus-plugin.version}</version>
                     <configuration>
                         <sourceEncoding>${project.build.sourceEncoding}</sourceEncoding>
-                        <stubsOutputDirectory>${project.build.directory}/generated-groovy-stubs</stubsOutputDirectory>
-                        <testStubsOutputDirectory>${project.build.directory}/generated-groovy-test-stubs</testStubsOutputDirectory>
                         <testSources>
-                            <fileSet>
+                            <testSource>
                                 <directory>${project.basedir}/src/test/groovy</directory>
                                 <includes>
                                     <include>**/*.groovy</include>
                                 </includes>
-                            </fileSet>
+                            </testSource>
                         </testSources>
                         <sources>
-                            <fileSet>
+                            <source>
                                 <directory>${project.basedir}/src/main/groovy</directory>
                                 <includes>
                                     <include>**/*.groovy</include>
                                 </includes>
-                            </fileSet>
+                            </source>
                         </sources>
                     </configuration>
                     <executions>

@@ -28,6 +28,9 @@
         <maven-compiler-plugin.version>3.2</maven-compiler-plugin.version>
         <gmavenplus-plugin.version>1.3</gmavenplus-plugin.version>
         <maven-plugin-plugin.version>3.4</maven-plugin-plugin.version>
+
+        <!-- github server corresponds to entry in ~/.m2/settings.xml -->
+        <github.global.server>been-pluger</github.global.server>
     </properties>
 
     <build>
@@ -107,6 +110,16 @@
                 </plugin>
             </plugins>
         </pluginManagement>
+
+        <plugins>
+            <plugin>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>2.8.1</version>
+                <configuration>
+                    <altDeploymentRepository>internal.repo::default::file://${project.build.directory}/mvn-repo</altDeploymentRepository>
+                </configuration>
+            </plugin>
+        </plugins>
     </build>
 
     <dependencyManagement>
@@ -169,21 +182,55 @@
         </dependencies>
     </dependencyManagement>
 
+    <modules>
+        <module>pluger-api</module>
+        <module>pluger-impl</module>
+        <module>pluger-maven-plugin</module>
+    </modules>
+
+    <distributionManagement>
+        <repository>
+            <id>internal.repo</id>
+            <name>Temporary Staging Repository</name>
+            <url>file://${project.build.directory}/mvn-repo</url>
+        </repository>
+    </distributionManagement>
+
     <profiles>
         <profile>
-            <id>pluger</id>
-
-            <modules>
-                <module>pluger-api</module>
-                <module>pluger-impl</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>pluger-maven-plugin</id>
-
-            <modules>
-                <module>pluger-maven-plugin</module>
-            </modules>
+            <id>deploy-github</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.github.github</groupId>
+                        <artifactId>site-maven-plugin</artifactId>
+                        <version>0.11</version>
+                        <configuration>
+                            <message>Maven artifacts for ${project.version}</message>
+                            <noJekyll>true</noJekyll>
+                            <outputDirectory>${project.build.directory}/mvn-repo</outputDirectory>
+                            <branch>refs/heads/mvn-repo</branch>
+                            <merge>true</merge>
+                            <includes>
+                                <include>**/*</include>
+                            </includes>
+                            <repositoryName>been-pluger</repositoryName>
+                            <repositoryOwner>donarus</repositoryOwner>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>site</goal>
+                                </goals>
+                                <phase>deploy</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
 

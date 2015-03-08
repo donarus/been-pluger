@@ -1,5 +1,6 @@
 package cz.cuni.mff.d3s.been.pluger.impl
 
+import cz.cuni.mff.d3s.been.pluger.IBaseServiceRegistrator
 import cz.cuni.mff.d3s.been.pluger.IPluginFilter
 import cz.cuni.mff.d3s.been.pluger.IDependencyResolver
 import cz.cuni.mff.d3s.been.pluger.IPluginActivator
@@ -7,6 +8,7 @@ import cz.cuni.mff.d3s.been.pluger.IPluginActivatorLoader
 import cz.cuni.mff.d3s.been.pluger.IPluginInitializer
 import cz.cuni.mff.d3s.been.pluger.IPluginInjector
 import cz.cuni.mff.d3s.been.pluger.IPluginLoader
+import cz.cuni.mff.d3s.been.pluger.IPluginStartedNotifier
 import cz.cuni.mff.d3s.been.pluger.IServicePreregistrator
 import cz.cuni.mff.d3s.been.pluger.IServiceRegistrator
 import cz.cuni.mff.d3s.been.pluger.IServiceRegistry
@@ -42,6 +44,8 @@ class PlugerTest extends Specification {
             assert pluger.plugerConfig.workingDirectory == workingDir
             assert pluger.plugerConfig.configDirectory == workingDir.resolve('config')
             assert Files.isDirectory(pluger.plugerConfig.configDirectory)
+            assert pluger.plugerConfig.pluginsWorkingDirectory == workingDir.resolve('plugins-wrk')
+            assert Files.isDirectory(pluger.plugerConfig.pluginsWorkingDirectory)
             assert pluger.plugerConfig.pluginsDirectory == workingDir.resolve('plugins')
             assert Files.isDirectory(pluger.plugerConfig.pluginsDirectory)
             assert pluger.plugerConfig.temporaryDirectory == workingDir.resolve('tmp')
@@ -53,20 +57,42 @@ class PlugerTest extends Specification {
             assert pluger.plugerConfig.disabledPlugins == []
 
             assert pluger.servicePreregistrators == []
-            assert pluger.pluginRegistry instanceof PlugerRegistry
+            assert pluger.baseServiceRegistrator instanceof BaseServiceRegistrator
+            assert pluger.serviceRegistry instanceof ServiceRegistry
             assert pluger.pluginLoader instanceof PluginLoader
             assert pluger.pluginFilter instanceof PluginFilter
             assert pluger.pluginUnpacker instanceof PluginUnpacker
             assert pluger.dependencyResolver instanceof DependencyResolver
             assert pluger.jarLoader instanceof JarLoader
             assert pluger.pluginActivatorLoader instanceof PluginActivatorLoader
-            assert pluger.serviceRegistrator instanceof ServiceRegistrator
+            assert pluger.serviceRegistrator instanceof ServiceActivator
             assert pluger.pluginInjector instanceof PluginInjector
             assert pluger.pluginInitializer instanceof PluginInitializer
             assert pluger.pluginStarter instanceof PluginStarter
+            assert pluger.pluginStartedNotifier instanceof PluginStartedNotifier
     }
 
-    def 'libs dir is deleted when this is specified in configuration'() {
+    def 'content of tmp dir is deleted on each startup'() {
+        given:
+            def workingDir = tmpFolder.newFolder().toPath()
+            def config = [
+                    (Pluger.WORKING_DIRECTORY_KEY) : workingDir,
+                    (Pluger.DEPENDENCIES_FINAL_KEY): []
+            ]
+            def tmpDirectory = workingDir.resolve("tmp")
+            Files.createDirectories(tmpDirectory)
+            def testFile = tmpDirectory.resolve("test.jar")
+
+            testFile.write("LOREM IPSUM DOLOR SIT AMET")
+
+        when:
+            Pluger.create(config)
+
+        then:
+            assert testFile.toFile().exists() == false
+    }
+
+    def 'content of libs dir is deleted when this is specified in configuration'() {
         given:
             def workingDir = tmpFolder.newFolder().toPath()
             def config = [
@@ -96,7 +122,8 @@ class PlugerTest extends Specification {
     def 'phases are ordered correctly'() {
         given:
             def config = Mock(PlugerConfig)
-            def pluginRegistry = Mock(IServiceRegistry)
+            def baseServiceRegistrator = Mock(IBaseServiceRegistrator)
+            def serviceRegistry = Mock(IServiceRegistry)
             def pluginLoader = Mock(IPluginLoader)
             def pluginFilter = Mock(IPluginFilter)
             def pluginUnpacker = Mock(IPluginUnpacker)
@@ -107,10 +134,12 @@ class PlugerTest extends Specification {
             def pluginInjector = Mock(IPluginInjector)
             def pluginInitializer = Mock(IPluginInitializer)
             def pluginStarter = Mock(IPluginStarter)
+            def pluginStartedNotifier = Mock(IPluginStartedNotifier)
 
             def pluger = new Pluger(
                     plugerConfig: config,
-                    pluginRegistry: pluginRegistry,
+                    baseServiceRegistrator: baseServiceRegistrator,
+                    serviceRegistry: serviceRegistry,
                     pluginLoader: pluginLoader,
                     pluginFilter: pluginFilter,
                     pluginUnpacker: pluginUnpacker,
@@ -120,7 +149,8 @@ class PlugerTest extends Specification {
                     serviceRegistrator: serviceRegistrator,
                     pluginInjector: pluginInjector,
                     pluginInitializer: pluginInitializer,
-                    pluginStarter: pluginStarter
+                    pluginStarter: pluginStarter,
+                    pluginStartedNotifier: pluginStartedNotifier
             )
 
             def allPlugins = [
@@ -157,9 +187,6 @@ class PlugerTest extends Specification {
             pluger.start()
 
         then:
-            1 * pluginRegistry.registerService(preregisteredService)
-
-        then:
             1 * pluginLoader.loadPlugins(config) >> allPlugins
 
         then:
@@ -175,19 +202,29 @@ class PlugerTest extends Specification {
             1 * jarLoader.loadJars(resolvedDependencies) >> jarLoaderClassLoader
 
         then:
+            1 * baseServiceRegistrator.register(config, serviceRegistry, jarLoaderClassLoader)
+
+        then:
+            1 * serviceRegistry.registerService(preregisteredService)
+
+        then:
             1 * pluginActivatorLoader.loadActivators(selectedPlugins, jarLoaderClassLoader) >> activators
 
         then:
-            1 * serviceRegistrator.activateServices(pluginRegistry, activators)
+            1 * serviceRegistrator.activateServices(serviceRegistry, activators)
 
         then:
-            1 * pluginInjector.injectServices(pluginRegistry)
+            1 * pluginInjector.injectServices(serviceRegistry)
 
         then:
             1 * pluginInitializer.initialize(activators)
 
         then:
             1 * pluginStarter.start(activators)
+
+        then:
+            1 * pluginStartedNotifier.notifyStarted(activators)
+
     }
 
 }

@@ -4,11 +4,11 @@ import cz.cuni.mff.d3s.been.pluger.IPluginActivator
 import cz.cuni.mff.d3s.been.pluger.IServiceRegistry
 import spock.lang.Specification
 
-class ServiceRegistratorTest extends Specification {
+class PluginServiceActivatorTest extends Specification {
 
     def 'test register plugins'() {
         given:
-            def registrator = new ServiceRegistrator()
+            def activator = new ServiceActivator()
             def pluginRegistry = Mock(IServiceRegistry)
             def activators = [
                     Mock(IPluginActivator),
@@ -16,7 +16,7 @@ class ServiceRegistratorTest extends Specification {
             ]
 
         when:
-            registrator.activateServices(pluginRegistry, activators)
+            activator.activateServices(pluginRegistry, activators)
 
         then:
             activators.each {

@@ -5,5 +5,6 @@ public interface IPluginActivator {
     void activate(IServiceRegistrator registry);
     void initialize();
     void start();
+    void notifyStarted();
 
 }

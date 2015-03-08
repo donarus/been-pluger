@@ -16,6 +16,8 @@ class PlugerConfig {
 
     Path disabledPluginsConfigFile
 
+    Path pluginsWorkingDirectory
+
     List<String> disabledPlugins
 
     List<String> finalDependencies

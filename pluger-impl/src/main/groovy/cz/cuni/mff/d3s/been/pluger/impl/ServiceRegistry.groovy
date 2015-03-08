@@ -4,7 +4,7 @@ import cz.cuni.mff.d3s.been.pluger.IPluginInjector
 import cz.cuni.mff.d3s.been.pluger.IServiceRegistry
 import cz.cuni.mff.d3s.been.pluger.MissingConstructorException
 
-class PlugerRegistry implements IServiceRegistry {
+class ServiceRegistry implements IServiceRegistry {
 
     private Collection<Service> registeredServices = []
 

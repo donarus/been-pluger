@@ -14,7 +14,7 @@
     <artifactId>pluger-impl</artifactId>
     <packaging>jar</packaging>
 
-    <name>Pluginator Impl</name>
+    <name>Pluger Impl</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

@@ -4,20 +4,20 @@ import cz.cuni.mff.d3s.been.pluger.IServiceRegistry
 import spock.lang.Shared
 import spock.lang.Specification
 
-class PluginRegistryTest extends Specification {
+class ServiceRegistryTest extends Specification {
 
     @Shared
     IServiceRegistry registry
 
     def setup() {
-        registry = new PlugerRegistry()
+        registry = new ServiceRegistry()
     }
 
     def 'get service'() {
         given:
             def service = new DummyServiceImpl()
             def serviceReference = new Service(serviceName: "serviceName", serviceInterface: DummyService, serviceInstance: service)
-            (registry as PlugerRegistry).@registeredServices = [serviceReference]
+            (registry as ServiceRegistry).@registeredServices = [serviceReference]
 
         when:
             def foundService = getServiceMethod.call()
@@ -41,7 +41,7 @@ class PluginRegistryTest extends Specification {
             def serviceReference2 = new Service(serviceName: "serviceName", serviceInterface: DummyService, serviceInstance: service2)
             def serviceReference3 = new Service(serviceName: "differendServiceName", serviceInterface: DummyService, serviceInstance: service3)
 
-            (registry as PlugerRegistry).@registeredServices = [
+            (registry as ServiceRegistry).@registeredServices = [
                     serviceReference1,
                     serviceReference2,
                     serviceReference3
@@ -63,7 +63,7 @@ class PluginRegistryTest extends Specification {
             def serviceReference2 = new Service(serviceName: "serviceName", serviceInterface: DummyService, serviceInstance: service2)
             def serviceReference3 = new Service(serviceName: "differendServiceName", serviceInterface: DummyService, serviceInstance: service3)
 
-            (registry as PlugerRegistry).@registeredServices = [
+            (registry as ServiceRegistry).@registeredServices = [
                     serviceReference1,
                     serviceReference2,
                     serviceReference3
@@ -93,10 +93,10 @@ class PluginRegistryTest extends Specification {
             def registeredServiceByNameAndInterface = registry.getService(name, interfaze)
 
         then:
-            (registry as PlugerRegistry).@registeredServices.size() == 1
-            (registry as PlugerRegistry).@registeredServices*.serviceInstance == [installedService]
-            (registry as PlugerRegistry).@registeredServices*.serviceInterface == [interfaze]
-            (registry as PlugerRegistry).@registeredServices*.serviceName == [name]
+            (registry as ServiceRegistry).@registeredServices.size() == 1
+            (registry as ServiceRegistry).@registeredServices*.serviceInstance == [installedService]
+            (registry as ServiceRegistry).@registeredServices*.serviceInterface == [interfaze]
+            (registry as ServiceRegistry).@registeredServices*.serviceName == [name]
             assert installedService == registeredServiceByNameAndInterface
             assert installedService == registeredServiceByInterface
             assert installedService instanceof DummyService

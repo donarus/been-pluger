@@ -34,6 +34,8 @@ class PluginActivatorLoaderTest extends Specification {
         void initialize() {}
         @Override
         void start() {}
+        @Override
+        void notifyStarted() {}
     }
 
     private static final class DummyActivator1 extends AbstractDummyTestActivator {}

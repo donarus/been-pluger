@@ -4,7 +4,7 @@ import cz.cuni.mff.d3s.been.pluger.IPluginActivator
 import cz.cuni.mff.d3s.been.pluger.IServiceRegistry
 import cz.cuni.mff.d3s.been.pluger.IPluginServiceActivator
 
-class ServiceRegistrator implements IPluginServiceActivator {
+class ServiceActivator implements IPluginServiceActivator {
 
     @Override
     void activateServices(IServiceRegistry pluginRegistry, Collection<IPluginActivator> activators) {

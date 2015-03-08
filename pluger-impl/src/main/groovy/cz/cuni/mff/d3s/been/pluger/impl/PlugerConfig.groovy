@@ -22,4 +22,6 @@ class PlugerConfig {
 
     List<String> finalDependencies
 
+    String[] programArgs
+
 }

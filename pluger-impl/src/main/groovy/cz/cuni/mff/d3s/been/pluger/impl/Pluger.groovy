@@ -17,6 +17,8 @@ class Pluger {
 
     public static final String CLEAR_LIB_DIR_KEY = "clear.libs"
 
+    public static final String PROGRAM_ARGS = "program.args"
+
     private PlugerConfig plugerConfig
 
     private IServiceRegistry serviceRegistry
@@ -78,11 +80,17 @@ class Pluger {
         servicePreregistrators << preregistrator
     }
 
-    public static Pluger create(Map<String, Object> configuration) {
+    public static Pluger create(Map<String, Object> configuration) throws PlugerException{
         Path workingDirectory = configuration.get(WORKING_DIRECTORY_KEY)
-        Collection<String> finalDependencies = configuration.get(DEPENDENCIES_FINAL_KEY)
-        boolean clearLibDir = configuration.get(CLEAR_LIB_DIR_KEY) == true
+        if(workingDirectory == null) {
+            throw new PlugerException("Invalid configuration: '${WORKING_DIRECTORY_KEY}' must be configured")
+        }
 
+        Collection<String> finalDependencies = configuration.get(DEPENDENCIES_FINAL_KEY, [])
+        boolean clearLibDir = configuration.get(CLEAR_LIB_DIR_KEY, false)
+        String[] programArgs = configuration.get(PROGRAM_ARGS, [])
+
+        // FIXME move creating and directory creating to separate class
         def unpackedLibsDirectory = workingDirectory.resolve('libs')
         if (clearLibDir) {
             unpackedLibsDirectory.deleteDir()
@@ -113,7 +121,8 @@ class Pluger {
                         temporaryDirectory: temporaryDirectory.toAbsolutePath(),
                         disabledPluginsConfigFile: disabledPluginsConfigFile.toAbsolutePath(),
                         disabledPlugins: disabledPlugins,
-                        finalDependencies: finalDependencies
+                        finalDependencies: finalDependencies,
+                        programArgs: programArgs
                 ),
                 serviceRegistry: new ServiceRegistry(),
                 pluginLoader: new PluginLoader(),

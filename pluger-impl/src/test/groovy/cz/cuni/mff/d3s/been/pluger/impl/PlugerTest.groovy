@@ -15,6 +15,7 @@ import cz.cuni.mff.d3s.been.pluger.IServiceRegistry
 import cz.cuni.mff.d3s.been.pluger.IPluginStarter
 import cz.cuni.mff.d3s.been.pluger.IPluginUnpacker
 import cz.cuni.mff.d3s.been.pluger.IPluginServiceActivator
+import cz.cuni.mff.d3s.been.pluger.PlugerException
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
@@ -24,16 +25,41 @@ import java.nio.file.Paths
 
 class PlugerTest extends Specification {
 
-
     @Rule
     private TemporaryFolder tmpFolder
 
-    def 'test create pluger'() {
+    def 'creating pluger fails when working dir not set'() {
+        given:
+            def config = [:]
+
+        when:
+            Pluger.create(config)
+
+        then:
+            PlugerException ex = thrown()
+            assert ex.message == "Invalid configuration: 'working.directory' must be configured"
+    }
+
+    def 'pluger defaults config contains expected values'() {
         given:
             def workingDir = tmpFolder.newFolder().toPath()
             def config = [
-                    (Pluger.WORKING_DIRECTORY_KEY) : workingDir,
-                    (Pluger.DEPENDENCIES_FINAL_KEY): []
+                (Pluger.WORKING_DIRECTORY_KEY) : workingDir
+        ]
+
+        when:
+            def pluger = Pluger.create(config)
+
+        then:
+            assert pluger.plugerConfig.workingDirectory == workingDir
+            assert pluger.plugerConfig.finalDependencies == []
+    }
+
+    def 'create pluger'() {
+        given:
+            def workingDir = tmpFolder.newFolder().toPath()
+            def config = [
+                    (Pluger.WORKING_DIRECTORY_KEY) : workingDir
             ]
 
         when:

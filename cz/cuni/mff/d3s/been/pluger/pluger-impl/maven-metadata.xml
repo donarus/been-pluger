@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>cz.cuni.mff.d3s.been.pluger</groupId>
+  <artifactId>pluger-impl</artifactId>
+  <versioning>
+    <versions>
+      <version>1.0-SNAPSHOT</version>
+    </versions>
+    <lastUpdated>20150308122906</lastUpdated>
+  </versioning>
+</metadata>

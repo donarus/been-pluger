@@ -1,5 +1,0 @@
-language: java
-jdk:
-  - oraclejdk8
-install: mvn install -DskipTests=true -Dmaven.javadoc.skip=true -Ppluger,pluger-maven-plugin -B -TC1 -V
-script: mvn test -Ppluger,pluger-maven-plugin -B -TC1

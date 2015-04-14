@@ -17,7 +17,7 @@ class Pluger {
 
     public static final String CLEAR_LIB_DIR_KEY = "clear.libs"
 
-    public static final String PROGRAM_ARGS = "program.args"
+    public static final String PLUGER_STARTUP_ARGS = "pluger.startup.args"
 
     private PlugerConfig plugerConfig
 
@@ -88,7 +88,7 @@ class Pluger {
 
         Collection<String> finalDependencies = configuration.get(DEPENDENCIES_FINAL_KEY, [])
         boolean clearLibDir = configuration.get(CLEAR_LIB_DIR_KEY, false)
-        String[] programArgs = configuration.get(PROGRAM_ARGS, [])
+        String[] plugetStartupArgs = configuration.get(PLUGER_STARTUP_ARGS, [])
 
         // FIXME move creating and directory creating to separate class
         def unpackedLibsDirectory = workingDirectory.resolve('libs')
@@ -122,7 +122,7 @@ class Pluger {
                         disabledPluginsConfigFile: disabledPluginsConfigFile.toAbsolutePath(),
                         disabledPlugins: disabledPlugins,
                         finalDependencies: finalDependencies,
-                        programArgs: programArgs
+                        plugerStartupArgs: plugetStartupArgs
                 ),
                 serviceRegistry: new ServiceRegistry(),
                 pluginLoader: new PluginLoader(),

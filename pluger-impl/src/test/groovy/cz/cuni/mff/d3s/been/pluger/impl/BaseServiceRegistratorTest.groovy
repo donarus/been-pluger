@@ -15,11 +15,11 @@ class BaseServiceRegistratorTest extends Specification {
             def baseServiceRegistrator = new BaseServiceRegistrator()
             def pluginsWorkingDirectory = Paths.get("plugins","working", "dir")
             def temporaryDirectory = Paths.get("temporary", "dir")
-            def programArgs = ["arg1", "arg2"].toArray()
+            def plugerStartupArgs = ["arg1", "arg2"].toArray()
             def plugerConfig = new PlugerConfig(
                     pluginsWorkingDirectory: pluginsWorkingDirectory,
                     temporaryDirectory: temporaryDirectory,
-                    programArgs: programArgs
+                    plugerStartupArgs: plugerStartupArgs
             )
             def serviceRegistry = Mock(ServiceRegistry)
             def pluginsClassLoader = Mock(ClassLoader)
@@ -31,6 +31,6 @@ class BaseServiceRegistratorTest extends Specification {
             1 * serviceRegistry.registerService(PlugerServiceConstants.PLUGIN_CLASSLOADER, ClassLoader, pluginsClassLoader)
             1 * serviceRegistry.registerService(PlugerServiceConstants.PLUGINS_WORKING_DIRECTORY, File, pluginsWorkingDirectory.toFile())
             1 * serviceRegistry.registerService(PlugerServiceConstants.TMP_DIRECTORY, File, temporaryDirectory.toFile())
-            1 * serviceRegistry.registerService(PlugerServiceConstants.PROGRAM_ARGUMENTS, String[], programArgs)
+            1 * serviceRegistry.registerService(PlugerServiceConstants.PLUGER_STARTUP_ARGUMENTS, String[], plugerStartupArgs)
     }
 }

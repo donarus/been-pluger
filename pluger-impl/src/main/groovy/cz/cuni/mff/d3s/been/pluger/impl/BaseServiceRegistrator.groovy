@@ -11,7 +11,7 @@ class BaseServiceRegistrator implements IBaseServiceRegistrator{
         registry.registerService(PlugerServiceConstants.PLUGIN_CLASSLOADER, ClassLoader, pluginClassLoader)
         registry.registerService(PlugerServiceConstants.PLUGINS_WORKING_DIRECTORY, File, plugerConfig.pluginsWorkingDirectory.toFile())
         registry.registerService(PlugerServiceConstants.TMP_DIRECTORY, File, plugerConfig.temporaryDirectory.toFile())
-        registry.registerService(PlugerServiceConstants.PROGRAM_ARGUMENTS, String[], plugerConfig.programArgs)
+        registry.registerService(PlugerServiceConstants.PLUGER_STARTUP_ARGUMENTS, String[], plugerConfig.plugerStartupArgs)
     }
 
 }

@@ -41,7 +41,7 @@ public class PlugerMojo extends AbstractMojo {
     @Parameter(required = true)
     private String activator;
 
-    @Parameter(defaultValue = "${project.build.directory}")
+    @Parameter(defaultValue = "${project.build.directory}", property = "pluger.plugin.output.dir")
     private String projectBuildDir;
 
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -63,7 +63,11 @@ public class PlugerMojo extends AbstractMojo {
         String jsonDescriptor = descriptor.createJsonDescriptor();
 
         String pluginFileName = String.format("%s-%s.plugin", project.getArtifactId(), project.getVersion());
-        File pluginDestFile = new File(projectBuildDir, pluginFileName);
+        File pluginDestDir = new File(projectBuildDir);
+        if(!pluginDestDir.exists()) {
+            pluginDestDir.mkdirs();
+        }
+        File pluginDestFile = new File(pluginDestDir, pluginFileName);
         try (ZipOutputStream zip = new ZipOutputStream(new FileOutputStream(pluginDestFile))) {
 
 

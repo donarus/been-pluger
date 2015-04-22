@@ -21,6 +21,8 @@ class Pluger {
 
     private PlugerConfig plugerConfig
 
+    private Map<String, String> pluginsConfiguration
+
     private IServiceRegistry serviceRegistry
 
     private IPluginLoader pluginLoader
@@ -40,6 +42,8 @@ class Pluger {
     private IPluginInjector pluginInjector
 
     private IPluginInitializer pluginInitializer
+
+    private IPluginConfigurer pluginConfigurer
 
     private IPluginStarter pluginStarter
 
@@ -62,6 +66,7 @@ class Pluger {
         baseServiceRegistrator.register(plugerConfig, serviceRegistry, pluginClassloader)
         preRegisterServices(serviceRegistry) // FIXME move to separate interface/class + unit test
         def pluginActivators = pluginActivatorLoader.loadActivators(allowedPlugins, pluginClassloader)
+        pluginConfigurer.configurePlugins(pluginsConfiguration, pluginActivators)
         serviceRegistrator.activateServices(serviceRegistry, pluginActivators)
         pluginInjector.injectServices(serviceRegistry)
         pluginInitializer.initialize(pluginActivators)
@@ -80,7 +85,7 @@ class Pluger {
         servicePreregistrators << preregistrator
     }
 
-    public static Pluger create(Map<String, Object> configuration) throws PlugerException{
+    public static Pluger create(Map<String, Object> configuration, Map<String, String> pluginsConfiguration) throws PlugerException{
         Path workingDirectory = configuration.get(WORKING_DIRECTORY_KEY)
         if(workingDirectory == null) {
             throw new PlugerException("Invalid configuration: '${WORKING_DIRECTORY_KEY}' must be configured")
@@ -124,6 +129,7 @@ class Pluger {
                         finalDependencies: finalDependencies,
                         plugerStartupArgs: plugetStartupArgs
                 ),
+                pluginsConfiguration: pluginsConfiguration,
                 serviceRegistry: new ServiceRegistry(),
                 pluginLoader: new PluginLoader(),
                 pluginFilter: new PluginFilter(),
@@ -134,6 +140,7 @@ class Pluger {
                 serviceRegistrator: new ServiceActivator(),
                 pluginInjector: new PluginInjector(),
                 pluginInitializer: new PluginInitializer(),
+                pluginConfigurer: new PluginConfigurer(),
                 pluginStarter: new PluginStarter(),
                 pluginStartedNotifier: new PluginStartedNotifier(),
                 baseServiceRegistrator: new BaseServiceRegistrator()

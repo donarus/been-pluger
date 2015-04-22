@@ -22,6 +22,4 @@ class PlugerConfig {
 
     List<String> finalDependencies
 
-    String[] plugerStartupArgs
-
 }

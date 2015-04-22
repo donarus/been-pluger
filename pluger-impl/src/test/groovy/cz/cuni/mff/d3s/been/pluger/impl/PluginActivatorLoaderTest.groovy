@@ -29,6 +29,8 @@ class PluginActivatorLoaderTest extends Specification {
 
     private abstract static class AbstractDummyTestActivator implements IPluginActivator {
         @Override
+        void configure(Map<String, String> configuration) {}
+        @Override
         void activate(IServiceRegistrator registry) {}
         @Override
         void initialize() {}

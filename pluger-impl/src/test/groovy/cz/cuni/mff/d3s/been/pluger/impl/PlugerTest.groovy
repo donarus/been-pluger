@@ -1,6 +1,7 @@
 package cz.cuni.mff.d3s.been.pluger.impl
 
 import cz.cuni.mff.d3s.been.pluger.IBaseServiceRegistrator
+import cz.cuni.mff.d3s.been.pluger.IPluginConfigurer
 import cz.cuni.mff.d3s.been.pluger.IPluginFilter
 import cz.cuni.mff.d3s.been.pluger.IDependencyResolver
 import cz.cuni.mff.d3s.been.pluger.IPluginActivator
@@ -31,9 +32,10 @@ class PlugerTest extends Specification {
     def 'creating pluger fails when working dir not set'() {
         given:
             def config = [:]
+            def pluginsConfiguration = [:]
 
         when:
-            Pluger.create(config)
+            Pluger.create(config, pluginsConfiguration)
 
         then:
             PlugerException ex = thrown()
@@ -44,11 +46,12 @@ class PlugerTest extends Specification {
         given:
             def workingDir = tmpFolder.newFolder().toPath()
             def config = [
-                (Pluger.WORKING_DIRECTORY_KEY) : workingDir
-        ]
+                    (Pluger.WORKING_DIRECTORY_KEY): workingDir
+            ]
+            def pluginsConfiguration = [:]
 
         when:
-            def pluger = Pluger.create(config)
+            def pluger = Pluger.create(config, pluginsConfiguration)
 
         then:
             assert pluger.plugerConfig.workingDirectory == workingDir
@@ -59,11 +62,12 @@ class PlugerTest extends Specification {
         given:
             def workingDir = tmpFolder.newFolder().toPath()
             def config = [
-                    (Pluger.WORKING_DIRECTORY_KEY) : workingDir
+                    (Pluger.WORKING_DIRECTORY_KEY): workingDir
             ]
+            def pluginsConfiguration = ["plugin": "configuration"]
 
         when:
-            def pluger = Pluger.create(config)
+            def pluger = Pluger.create(config, pluginsConfiguration)
 
         then:
             assert pluger instanceof Pluger
@@ -82,6 +86,7 @@ class PlugerTest extends Specification {
             assert !Files.exists(pluger.plugerConfig.disabledPluginsConfigFile)
             assert pluger.plugerConfig.disabledPlugins == []
 
+            assert pluger.pluginsConfiguration == pluginsConfiguration
             assert pluger.servicePreregistrators == []
             assert pluger.baseServiceRegistrator instanceof BaseServiceRegistrator
             assert pluger.serviceRegistry instanceof ServiceRegistry
@@ -105,6 +110,7 @@ class PlugerTest extends Specification {
                     (Pluger.WORKING_DIRECTORY_KEY) : workingDir,
                     (Pluger.DEPENDENCIES_FINAL_KEY): []
             ]
+            def pluginsConfiguration = [:]
             def tmpDirectory = workingDir.resolve("tmp")
             Files.createDirectories(tmpDirectory)
             def testFile = tmpDirectory.resolve("test.jar")
@@ -112,7 +118,7 @@ class PlugerTest extends Specification {
             testFile.write("LOREM IPSUM DOLOR SIT AMET")
 
         when:
-            Pluger.create(config)
+            Pluger.create(config, pluginsConfiguration)
 
         then:
             assert testFile.toFile().exists() == false
@@ -126,6 +132,7 @@ class PlugerTest extends Specification {
                     (Pluger.DEPENDENCIES_FINAL_KEY): [],
                     (Pluger.CLEAR_LIB_DIR_KEY)     : shouldBeDeleted
             ]
+            def pluginsConfiguration = [:]
             def libsDir = workingDir.resolve("libs")
             Files.createDirectories(libsDir)
             def testFile = libsDir.resolve("test.jar")
@@ -133,7 +140,7 @@ class PlugerTest extends Specification {
             testFile.write("LOREM IPSUM DOLOR SIT AMET")
 
         when:
-            Pluger.create(config)
+            Pluger.create(config, pluginsConfiguration)
 
         then:
             assert testFile.toFile().exists() == exists
@@ -147,6 +154,7 @@ class PlugerTest extends Specification {
 
     def 'phases are ordered correctly'() {
         given:
+            def pluginsConfiguration = ["fake": "plugin configuration"]
             def config = Mock(PlugerConfig)
             def baseServiceRegistrator = Mock(IBaseServiceRegistrator)
             def serviceRegistry = Mock(IServiceRegistry)
@@ -156,6 +164,7 @@ class PlugerTest extends Specification {
             def dependencyResolver = Mock(IDependencyResolver)
             def jarLoader = Mock(JarLoader)
             def pluginActivatorLoader = Mock(IPluginActivatorLoader)
+            def pluginConfigurer = Mock(IPluginConfigurer)
             def serviceRegistrator = Mock(IPluginServiceActivator)
             def pluginInjector = Mock(IPluginInjector)
             def pluginInitializer = Mock(IPluginInitializer)
@@ -163,6 +172,7 @@ class PlugerTest extends Specification {
             def pluginStartedNotifier = Mock(IPluginStartedNotifier)
 
             def pluger = new Pluger(
+                    pluginsConfiguration: pluginsConfiguration,
                     plugerConfig: config,
                     baseServiceRegistrator: baseServiceRegistrator,
                     serviceRegistry: serviceRegistry,
@@ -173,6 +183,7 @@ class PlugerTest extends Specification {
                     jarLoader: jarLoader,
                     pluginActivatorLoader: pluginActivatorLoader,
                     serviceRegistrator: serviceRegistrator,
+                    pluginConfigurer: pluginConfigurer,
                     pluginInjector: pluginInjector,
                     pluginInitializer: pluginInitializer,
                     pluginStarter: pluginStarter,
@@ -235,6 +246,9 @@ class PlugerTest extends Specification {
 
         then:
             1 * pluginActivatorLoader.loadActivators(selectedPlugins, jarLoaderClassLoader) >> activators
+
+        then:
+            1 * pluginConfigurer.configurePlugins(pluginsConfiguration, activators)
 
         then:
             1 * serviceRegistrator.activateServices(serviceRegistry, activators)
